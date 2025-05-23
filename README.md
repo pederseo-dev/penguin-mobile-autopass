@@ -147,6 +147,119 @@ penguin-mobile-autopass/
 └── README.md           # Este archivo
 ```
 
-## 📄 Licencia
+## Configuración de Android
 
-Este proyecto está bajo la Licencia MIT - ver el archivo [LICENSE.md](LICENSE.md) para más detalles.
+### Configuración del build.gradle (Nivel de Proyecto)
+```gradle
+buildscript {
+    ext {
+        buildToolsVersion = "33.0.0"
+        minSdkVersion = 21
+        compileSdkVersion = 33
+        targetSdkVersion = 33
+        ndkVersion = "23.1.7779620"
+    }
+    repositories {
+        google()
+        mavenCentral()
+    }
+    dependencies {
+        classpath("com.android.tools.build:gradle:7.3.1")
+        classpath("com.facebook.react:react-native-gradle-plugin")
+    }
+}
+```
+
+### Configuración del build.gradle (Nivel de App)
+```gradle
+apply plugin: "com.android.application"
+apply plugin: "com.facebook.react"
+
+android {
+    namespace "com.penguinmobileautopass"
+    compileSdkVersion rootProject.ext.compileSdkVersion
+
+    defaultConfig {
+        applicationId "com.penguinmobileautopass"
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
+        versionCode 1
+        versionName "1.0"
+    }
+
+    signingConfigs {
+        debug {
+            storeFile file('debug.keystore')
+            storePassword 'android'
+            keyAlias 'androiddebugkey'
+            keyPassword 'android'
+        }
+        // Configuración para release (agregar cuando sea necesario)
+    }
+
+    buildTypes {
+        debug {
+            signingConfig signingConfigs.debug
+        }
+        release {
+            signingConfig signingConfigs.debug // Cambiar a release cuando esté listo
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
+        }
+    }
+}
+
+dependencies {
+    implementation("com.facebook.react:react-android")
+    implementation("com.facebook.react:hermes-android")
+    // Otras dependencias necesarias
+}
+```
+
+### Configuración del AndroidManifest.xml
+```xml
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <uses-permission android:name="android.permission.INTERNET" />
+    <!-- Otros permisos necesarios -->
+
+    <application
+        android:name=".MainApplication"
+        android:label="@string/app_name"
+        android:icon="@mipmap/ic_launcher"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:allowBackup="false"
+        android:theme="@style/AppTheme">
+        <activity
+            android:name=".MainActivity"
+            android:label="@string/app_name"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|screenSize|smallestScreenSize|uiMode"
+            android:launchMode="singleTask"
+            android:windowSoftInputMode="adjustResize"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+    </application>
+</manifest>
+```
+
+### Configuraciones Importantes
+
+1. **Versiones de SDK**:
+   - compileSdkVersion: 33 (Android 13)
+   - targetSdkVersion: 33
+   - minSdkVersion: 21 (Android 5.0)
+
+2. **Gradle**:
+   - Versión de Gradle: 7.5.1
+   - Versión del plugin de Android: 7.3.1
+
+3. **Configuración de ProGuard**:
+   - Habilitado para builds de release
+   - Archivo de reglas: `proguard-rules.pro`
+
+4. **Firma de la App**:
+   - Debug: Usa el keystore por defecto
+   - Release: Requiere configuración de keystore personalizado
